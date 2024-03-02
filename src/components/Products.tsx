@@ -13,6 +13,7 @@ const Products = async () => {
         <ProductsCard item={item} key={item._id} />
       ))}
     </Container>
+    
   );
 };
 
