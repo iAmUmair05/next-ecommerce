@@ -4,7 +4,7 @@ import Stripe from "stripe";
 
 export const POST = async (request: NextRequest) => {
   // @ts-ignore
-  const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY!);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   try {
     const reqBody = await request.json();
     const { items, email } = await reqBody;
