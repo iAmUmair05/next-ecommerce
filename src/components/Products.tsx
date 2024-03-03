@@ -13,8 +13,9 @@ const Products = async () => {
         <ProductsCard item={item} key={item._id} />
       ))}
     </Container>
-    
+
   );
 };
 
 export default Products;
+

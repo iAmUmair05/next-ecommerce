@@ -14,7 +14,8 @@ const PaymentForm = () => {
     (state: StateProps) => state?.shopping
   );
   const [totalAmt, setTotalAmt] = useState(0);
-  
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     let amt = 0;
     productData.map((item: Products) => {
@@ -25,14 +26,39 @@ const PaymentForm = () => {
   }, [productData]);
 
   // =============  Stripe Payment Start here ==============
-  
+
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
   );
   const { data: session } = useSession();
 
+  // const handleCheckout = async () => {
+  //   setLoading(true);
+
+  //   const stripe = await stripePromise;
+  //   const response = await fetch("http://localhost:3000/api/checkout", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       items: productData,
+  //       email: session?.user?.email,
+  //     }),
+  //   });
+  //   const data = await response.json();
+
+  //   if (response.ok) {
+  //     await dispatch(saveOrder({ order: productData, id: data.id }));
+  //     stripe?.redirectToCheckout({ sessionId: data.id });
+  //     dispatch(resetCart());
+  //   } else {
+  //     setLoading(false);
+  //     throw new Error("Failed to create Stripe Payment");
+  //   }
+  // };
+
   const handleCheckout = async () => {
-    
+    setLoading(true);
+
     const stripe = await stripePromise;
     const response = await fetch("http://localhost:3000/api/checkout", {
       method: "POST",
@@ -46,9 +72,18 @@ const PaymentForm = () => {
 
     if (response.ok) {
       await dispatch(saveOrder({ order: productData, id: data.id }));
-      stripe?.redirectToCheckout({ sessionId: data.id });
-      dispatch(resetCart());
+      stripe?.redirectToCheckout({ sessionId: data.id })
+        .then((result) => {
+          if (result.error) {
+
+            throw new Error("Failed to redirect to checkout");
+          } else {
+            // Payment successfu
+            dispatch(resetCart()); // Reset the cart after successful payment
+          }
+        });
     } else {
+      setLoading(false);
       throw new Error("Failed to create Stripe Payment");
     }
   };
@@ -58,36 +93,13 @@ const PaymentForm = () => {
   return (
     <div className="w-full bg-white p-4">
       <h2>Cart Totals</h2>
-      <div className="border-b-[1px] border-b-slate-300 py-2">
-        <div className="max-w-lg flex items-center justify-between">
-          <p className="uppercase font-medium">Subtotal</p>
-          <p>
-            <FormattedPrice amount={totalAmt} />
-          </p>
-        </div>
-      </div>
-      <div className="border-b-[1px] border-b-slate-300 py-2">
-        <div className="max-w-lg flex items-center justify-between">
-          <p className="uppercase font-medium">Shipping</p>
-          <p>
-            <FormattedPrice amount={20} />
-          </p>
-        </div>
-      </div>
-      <div className="border-b-[1px] border-b-slate-300 py-2">
-        <div className="max-w-lg flex items-center justify-between">
-          <p className="uppercase font-medium">Total Price</p>
-          <p>
-            <FormattedPrice amount={totalAmt + 20} />
-          </p>
-        </div>
-      </div>
+
       {userInfo ? (
         <button
           onClick={handleCheckout}
-          className="bg-black text-slate-100 mt-4 py-3 px-6 hover:bg-orange-950 cursor-pointer duration-200"
+          className={`bg-black text-slate-100 mt-4 py-3 px-6 hover:bg-orange-950 cursor-pointer duration-200 ${loading ? 'opacity-75 pointer-events-none' : ''}`}
         >
-          Proceed to checkout
+          {loading ? 'Loading...' : 'Proceed to checkout'}
         </button>
       ) : (
         <div>
