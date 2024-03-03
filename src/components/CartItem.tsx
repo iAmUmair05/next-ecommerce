@@ -43,6 +43,7 @@ const CartItem = () => {
                 className="w-20 h-20 object-cover"
                 loading="lazy"
               />
+              <p>{item.title}</p>
             </div>
             {/* quantity */}
             <div className="flex items-center justify-start gap-x-3 border-[1px] border-slate-300 py-2 px-4 w-full md:w-auto">
