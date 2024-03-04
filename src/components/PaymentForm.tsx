@@ -62,7 +62,7 @@ const PaymentForm = () => {
 
     try {
       const stripe = await stripePromise;
-      const response = await fetch(`https://shopper-next-ecommerce.vercel.app/api/checkout`, {
+      const response = await fetch(`${process.env.NEXTAUTH_URL}/api/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
