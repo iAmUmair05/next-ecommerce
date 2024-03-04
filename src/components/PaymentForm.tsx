@@ -60,33 +60,37 @@ const PaymentForm = () => {
   const handleCheckout = async () => {
     setLoading(true);
 
-    const stripe = await stripePromise;
-    const response = await fetch("http://localhost:3000/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: productData,
-        email: session?.user?.email,
-      }),
-    });
-    const data = await response.json();
+    try {
+      const stripe = await stripePromise;
+      const response = await fetch(`${process.env.NEXTAUTH_URL}/api/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: productData,
+          email: session?.user?.email,
+        }),
+      });
 
-    if (response.ok) {
+      if (!response.ok) {
+        throw new Error("Failed to create Stripe Payment");
+      }
+
+      const data = await response.json();
       await dispatch(saveOrder({ order: productData, id: data.id }));
       stripe?.redirectToCheckout({ sessionId: data.id })
         .then((result) => {
           if (result.error) {
-            toast.error("something went wrong. Please try later")
+            toast.error("Something went wrong. Please try again later.");
             throw new Error("Failed to redirect to checkout");
           } else {
-            // Payment successfu
+            // Payment successful
             dispatch(resetCart()); // Reset the cart after successful payment
           }
         });
-    } else {
+    } catch (error) {
+      console.error(error);
       setLoading(false);
-      throw new Error("Failed to create Stripe Payment");
-
+      toast.error("Something went wrong. Please try again later.");
     }
   };
 
