@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { useSession } from "next-auth/react";
 import { resetCart, saveOrder } from "@/redux/shoppingSlice";
+import toast, { Toaster } from "react-hot-toast";
 
 const PaymentForm = () => {
   const dispatch = useDispatch();
@@ -75,7 +76,7 @@ const PaymentForm = () => {
       stripe?.redirectToCheckout({ sessionId: data.id })
         .then((result) => {
           if (result.error) {
-
+            toast.error("something went wrong. Please try later")
             throw new Error("Failed to redirect to checkout");
           } else {
             // Payment successfu
@@ -85,6 +86,7 @@ const PaymentForm = () => {
     } else {
       setLoading(false);
       throw new Error("Failed to create Stripe Payment");
+
     }
   };
 
@@ -111,6 +113,7 @@ const PaymentForm = () => {
           </p>
         </div>
       )}
+      <Toaster />
     </div>
   );
 };
