@@ -4,7 +4,7 @@ import Stripe from "stripe";
 
 export const POST = async (request: NextRequest) => {
   // @ts-ignore
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY!);
   try {
     const reqBody = await request.json();
     const { items, email } = await reqBody;
@@ -26,8 +26,8 @@ export const POST = async (request: NextRequest) => {
       payment_method_types: ["card"],
       line_items: extractingItems,
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_NEXTAUTH-URL}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_NEXTAUTH-URL}/checkout`,
+      success_url: `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/checkout`,
       metadata: {
         email,
       },
