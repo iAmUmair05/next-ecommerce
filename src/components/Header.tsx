@@ -49,7 +49,7 @@ const Header = () => {
 
   return (
     <div className="bg-cyan-400 h-20 top-0 sticky z-50">
-      <Container className="h-full flex items-center md:gap-x-3 justify-between">
+      <Container className="h-full flex items-center md:gap-x-3 sm:justify-between justify-center">
         <Logo />
         {/* Search Field */}
 
